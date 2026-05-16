@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useCallback } from "react";
 import { useSimulationStore } from "@/lib/metro/simulation-store";
 import { linhaCentroStations, linhaSulStations } from "@/lib/metro/stations";
 import { Line } from "@/lib/metro/types";
+import { useSocket } from "@/hooks/use-socket"; // NOVO HOOK DE WEBSOCKET
+
 import { TrainMap } from "./train-map";
 import { TrainCard } from "./train-card";
 import { EventLog } from "./event-log";
@@ -20,49 +22,25 @@ export function Dashboard() {
     events,
     alerts,
     speed,
-    isRunning,
     isConnected,
-    initialize,
-    tick,
     setSpeed,
-    setIsRunning,
     clearAlert,
   } = useSimulationStore();
 
-  const tickIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Inicializa a simulação
-  useEffect(() => {
-    initialize();
-  }, [initialize]);
-
-  // Loop de simulação
-  useEffect(() => {
-    if (isRunning) {
-      tickIntervalRef.current = setInterval(() => {
-        tick();
-      }, 1000 / speed);
-    } else {
-      if (tickIntervalRef.current) {
-        clearInterval(tickIntervalRef.current);
-        tickIntervalRef.current = null;
-      }
-    }
-
-    return () => {
-      if (tickIntervalRef.current) {
-        clearInterval(tickIntervalRef.current);
-      }
-    };
-  }, [isRunning, speed, tick]);
+  // 🔌 CONECTANDO O DASHBOARD AO BACKEND VIA WEBSOCKET
+  // Ao chamar esse hook, a conexão Socket.io é iniciada e a store do Zustand
+  // passa a ser alimentada automaticamente com os eventos que vêm da rede.
+  useSocket();
 
   const handleSpeedChange = useCallback((newSpeed: number) => {
     setSpeed(newSpeed);
+    // Nota futura: Aqui você pode emitir via socket para o backend alterar o timer também!
   }, [setSpeed]);
 
   const handleToggleRunning = useCallback(() => {
-    setIsRunning(!isRunning);
-  }, [isRunning, setIsRunning]);
+    // setIsRunning(!isRunning);
+    alert('Na versão WebSocket, o controle de Pause deve ser enviado ao Backend!');
+  }, []);
 
   const handleClearAlert = useCallback((trainId: string) => {
     clearAlert(trainId);
@@ -89,7 +67,7 @@ export function Dashboard() {
           <div className="flex items-center gap-3">
             <SpeedControl
               speed={speed}
-              isRunning={isRunning}
+              isRunning={true} // Forçado a rodar por padrão
               onSpeedChange={handleSpeedChange}
               onToggleRunning={handleToggleRunning}
             />
