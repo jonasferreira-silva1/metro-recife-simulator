@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { Train, TrainState, Line, Direction } from "@/lib/metro/types";
 import { Station } from "@/lib/metro/types";
+import { getMapPosition } from "@/lib/metro/train-position";
 import { Train as TrainIcon, AlertTriangle } from "lucide-react";
 
 interface TrainMapProps {
@@ -26,24 +27,6 @@ const stateLabels: Record<TrainState, string> = {
 export function TrainMap({ stations, trains, line, title }: TrainMapProps) {
   const lineTrains = trains.filter((t) => t.line === line);
   const lineColor = line === Line.CENTRO ? "var(--metro-centro)" : "var(--metro-sul)";
-
-  // Encontra posição do trem entre estações
-  const getTrainPosition = (train: Train) => {
-    const currentIndex = train.currentStation.orderIndex;
-    const isMoving = train.state === TrainState.MOVING || train.state === TrainState.ARRIVING;
-
-    if (isMoving && train.nextStation) {
-      const progress = train.progress / 100;
-
-      if (train.direction === Direction.FORWARD) {
-        return currentIndex + progress;
-      } else {
-        return currentIndex - progress;
-      }
-    }
-
-    return currentIndex;
-  };
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
@@ -121,7 +104,7 @@ export function TrainMap({ stations, trains, line, title }: TrainMapProps) {
 
             {/* Trens */}
             {lineTrains.map((train) => {
-              const pos = getTrainPosition(train);
+              const pos = getMapPosition(train);
               const percentage = (pos / (stations.length - 1)) * 100;
               const isBlocked = train.state === TrainState.DOOR_BLOCKED;
               const leftOffset = 16; // px padding
@@ -183,7 +166,7 @@ export function TrainMap({ stations, trains, line, title }: TrainMapProps) {
                                 : lineColor
                               : "transparent",
                           borderRightColor:
-                            train.direction === Direction.BACKWARD
+                            train.direction === Direction.RETURN
                               ? isBlocked
                                 ? "var(--destructive)"
                                 : lineColor

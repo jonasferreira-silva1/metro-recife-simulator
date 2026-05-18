@@ -63,6 +63,7 @@ export interface Train {
 export interface SimulationEvent {
   id: string;
   trainId: string;
+  trainName?: string;
   stationId: string;
   stationName: string;
   eventType: EventType;

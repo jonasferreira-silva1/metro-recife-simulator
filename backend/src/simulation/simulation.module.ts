@@ -14,6 +14,7 @@ import { EventsModule } from '../events/events.module';
     EventsModule,
   ],
   providers: [SimulationService, SimulationGateway],
+  exports: [SimulationService],
   controllers: [SimulationController],
 })
 export class SimulationModule {}

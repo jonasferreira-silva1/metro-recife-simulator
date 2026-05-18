@@ -41,10 +41,20 @@ describe('State Machine FSM', () => {
   it('should transition from ARRIVING to STOPPED after 3 ticks and emit train:arrived', () => {
     const ctx = createBaseContext(TrainState.ARRIVING, 3);
     const result = processTick(ctx, stationMock, 0, 3);
-    
+
     expect(result).not.toBeNull();
     expect(result!.newState).toBe(TrainState.STOPPED);
     expect(result!.eventToEmit).toBe('train:arrived');
+    expect(result!.stationIndexDelta).toBe(1);
+  });
+
+  it('should retreat station index on arrival when moving return', () => {
+    const ctx = createBaseContext(TrainState.ARRIVING, 3);
+    ctx.isForward = false;
+    ctx.currentStationIndex = 5;
+    const result = processTick(ctx, stationMock, 0, 3);
+
+    expect(result!.stationIndexDelta).toBe(-1);
   });
 
   it('should transition from STOPPED to DOORS_OPEN after 2 ticks', () => {
@@ -96,14 +106,14 @@ describe('State Machine FSM', () => {
     expect(result!.newState).toBe(TrainState.DOORS_OPEN);
   });
 
-  it('should transition DEPARTING to MOVING and emit departed', () => {
+  it('should transition DEPARTING to MOVING without advancing station (trecho inicia na origem)', () => {
     const ctx = createBaseContext(TrainState.DEPARTING, 2);
     const result = processTick(ctx, stationMock, 0, 3);
-    
+
     expect(result).not.toBeNull();
     expect(result!.newState).toBe(TrainState.MOVING);
     expect(result!.eventToEmit).toBe('train:departed');
-    expect(result!.stationIndexDelta).toBe(1); // moving forward
+    expect(result!.stationIndexDelta).toBe(0);
   });
 
   it('should reverse direction at terminal', () => {

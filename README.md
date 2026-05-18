@@ -1,8 +1,10 @@
 <div align="center">
 
-# 🚇 MetroRecife Simulator
+# MetroRecife Simulator
 
 **Simulador em tempo real do Metrô do Recife — CBTU**
+
+*Documentação Técnica & Guia de Desenvolvimento · Versão 1.0 · Recife, 2026*
 
 [![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com)
 [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org)
@@ -11,43 +13,55 @@
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
 [![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io)
 
-*Desenvolvido por [Jonas Ferreira Silva](https://github.com/jonasferreira-silva1) — Recife, Pernambuco*
+**Jonas Ferreira Silva** — [github.com/jonasferreira-silva1](https://github.com/jonasferreira-silva1)
 
 </div>
 
 ---
 
-## A História Por Trás do Projeto
+## Uma curiosidade que virou código
 
-Todo dia útil, o metrô da CBTU corta Recife de ponta a ponta. Quem mora no Grande Recife conhece bem essa rotina: esperar na plataforma, ouvir o apito, sentir as portas fecharem com aquele peso metálico característico. Para a maioria das pessoas é apenas transporte. Para um desenvolvedor curioso, é um sistema de estados.
+Desde criança, toda vez que entrava no metrô eu olhava para aquelas portas, para o apito, para o painel do maquinista e pensava: *como isso funciona por dentro?* Não era vaidade técnica — era curiosidade mesmo. O metrô da CBTU faz parte da rotina de quem vive no Grande Recife: esperar na plataforma, sentir o peso das portas fechando, ver o trem sumir no túnel. Para quase todo mundo é só transporte. Para quem desenvolve software, é um **sistema de estados**.
 
-Este projeto nasceu de uma pergunta simples feita em um dia comum dentro de um vagão entre Camaragibe e Recife:
+Um dia, entre Camaragibe e Recife, a pergunta ficou impossível de ignorar:
 
 > *"Como eu simularia isso em código?"*
 
-Não havia cliente pedindo, não havia prazo, não havia entrevista marcada. Era pura curiosidade técnica — a vontade de pegar algo do mundo real que todo pernambucano conhece e transformá-lo em software, com estados, regras, sensores e tempo real.
+Não havia cliente, prazo ou entrevista. Só a vontade de pegar algo que todo pernambucano conhece — o Metrô do Recife — e traduzir em TypeScript: estados, regras, sensores, tempo real. O **MetroRecife Simulator** é essa tradução.
 
 ---
 
-## Por Que Este Projeto Importa
+## Por que este projeto existe
 
-Portfolios de desenvolvimento costumam ser iguais: um To-Do List, um e-commerce básico, um CRUD com autenticação. O MetroRecife Simulator conta uma história diferente. Ele demonstra três qualidades que todo time de engenharia valoriza:
+Portfólios costumam repetir os mesmos padrões: to-do list, e-commerce, CRUD com login. Nada de errado com isso — mas raramente contam uma história. Este projeto conta a de alguém que **não esperou um requisito aparecer**: olhou para a cidade, modelou as regras do zero e entregou algo que qualquer pessoa pode abrir no navegador e ver funcionando.
 
-- **Iniciativa** — o projeto existiu porque o desenvolvedor quis, não porque foi pedido
-- **Pensamento de sistemas** — modelar uma FSM de trem exige entender transições, concorrência e condições de erro
-- **Execução** — uma simulação visual funcionando é infinitamente mais convincente do que arquitetura documentada sem código rodando
+Três qualidades que times de engenharia valorizam:
+
+| Qualidade | O que o projeto demonstra |
+|-----------|---------------------------|
+| **Iniciativa** | Existiu porque houve curiosidade, não porque alguém pediu |
+| **Pensamento de sistemas** | FSM de trem, concorrência, falhas de sensor, escalonamento ao operador |
+| **Execução** | Painel ao vivo > diagrama sem código rodando |
 
 ---
 
-## Sobre o Sistema Real — CBTU Recife
+## O sistema real — CBTU Recife
 
 | | |
 |---|---|
 | **Operadora** | CBTU — Companhia Brasileira de Trens Urbanos |
-| **Cidade** | Região Metropolitana do Recife — Pernambuco, Brasil |
-| **Linhas simuladas** | Linha Centro (vermelha) e Linha Sul (azul) |
-| **Total de estações** | 30 estações (15 por linha) |
-| **Passageiros/dia** | ~350.000 usuários (dado público CBTU) |
+| **Região** | Grande Recife — Pernambuco, Brasil |
+| **Linhas** | Centro (vermelha) e Sul (azul) |
+| **Estações** | 30 (15 por linha) — dados reais do mapa oficial |
+| **Passageiros/dia** | ~350.000 (dado público CBTU) |
+
+### Linha Centro — Camaragibe → Recife
+
+`Camaragibe` → `Cosme e Damião` → `Rodoviária` → `Curado` → `Alto do Céu` → `Coqueiral` → `Tejipió` → `Barro` → `Werneck` → `Santa Luzia` → `Mangueira` → `Ipiranga` → `Afogados` → `Joana Bezerra` → `Recife`
+
+### Linha Sul — Jaboatão → Recife
+
+`Jaboatão` → `Engenho Velho` → `Floriano` → `Cavaleiro` → `Cajueiro Seco` → `Prazeres` → `Monte dos Guararapes` → `Porta Larga` → `Aeroporto` → `Tancredo Neves` → `Shopping` → `Antônio Falcão` → `Imbiribeira` → `Largo da Paz` → `Recife`
 
 ---
 
@@ -56,10 +70,8 @@ Portfolios de desenvolvimento costumam ser iguais: um To-Do List, um e-commerce 
 ```
 ┌─────────────────┐     WebSocket      ┌─────────────────┐
 │   Next.js       │◄──────────────────►│   NestJS        │
-│   Frontend      │                    │   Backend       │
 │   :3000         │                    │   :3001         │
 └─────────────────┘                    └────────┬────────┘
-                                                │
                                                 │ TypeORM
                                                 ▼
                                        ┌─────────────────┐
@@ -68,31 +80,17 @@ Portfolios de desenvolvimento costumam ser iguais: um To-Do List, um e-commerce 
                                        └─────────────────┘
 ```
 
-| Camada | Tecnologia | Responsabilidade |
-|---|---|---|
-| Backend | NestJS + TypeScript | Motor da simulação, FSM, WebSocket Gateway, API REST |
-| Frontend | Next.js + TypeScript | Painel de controle em tempo real, visualização das linhas |
-| Banco de Dados | PostgreSQL | Histórico de eventos, estações, logs de sensor de porta |
-| Comunicação RT | Socket.io | Emissão de eventos de estado em tempo real |
-| Infraestrutura | Docker + Docker Compose | Orquestração de todos os serviços |
+| Camada | Stack | Papel |
+|--------|-------|-------|
+| Backend | NestJS + TypeScript | Motor da simulação, FSM, WebSocket, API REST |
+| Frontend | Next.js + TypeScript | Painel em tempo real, mapa, operador, log |
+| Banco | PostgreSQL | Estações, trens, histórico de eventos |
+| RT | Socket.io | Estado do trem e comandos do operador |
+| Infra | Docker Compose | Um comando sobe tudo |
 
 ---
 
-## Linhas Simuladas
-
-### 🔴 Linha Centro — Camaragibe → Recife (15 estações)
-
-`Camaragibe` → `Cosme e Damião` → `Rodoviária` → `Curado` → `Alto do Céu` → `Coqueiral` → `Tejipió` → `Barro` → `Werneck` → `Santa Luzia` → `Mangueira` → `Ipiranga` → `Afogados` → `Joana Bezerra` → `Recife`
-
-### 🔵 Linha Sul — Jaboatão → Recife (15 estações)
-
-`Jaboatão` → `Engenho Velho` → `Floriano` → `Cavaleiro` → `Cajueiro Seco` → `Prazeres` → `Monte dos Guararapes` → `Porta Larga` → `Aeroporto` → `Tancredo Neves` → `Shopping` → `Antônio Falcão` → `Imbiribeira` → `Largo da Paz` → `Recife`
-
----
-
-## Máquina de Estados do Trem
-
-O coração do sistema é a FSM (Finite State Machine) que governa o comportamento de cada trem. Cada instância possui um estado exclusivo e só pode transitar entre estados por eventos válidos.
+## Máquina de estados do trem
 
 ```
 MOVING ──► ARRIVING ──► STOPPED ──► DOORS_OPEN
@@ -107,35 +105,25 @@ MOVING ──► ARRIVING ──► STOPPED ──► DOORS_OPEN
                            MOVING
 ```
 
-| Estado | Descrição |
-|---|---|
-| `MOVING` | Trem se deslocando entre duas estações |
-| `ARRIVING` | Trem desacelerando, a 500m da próxima estação |
-| `STOPPED` | Trem parado na plataforma, portas ainda fechadas |
-| `DOORS_OPEN` | Portas abertas, embarque e desembarque em curso |
-| `DOOR_BLOCKED` | Sensor de porta acionado — objeto ou pessoa detectados |
-| `DOORS_CLOSING` | Comando de fechar portas emitido |
-| `DEPARTING` | Portas confirmadas fechadas, aguardando liberação da via |
+**Sensor de porta (Fase 3):**
 
-### Lógica do Sensor de Porta
+- Bloqueio manual (painel) ou automático (`DOOR_SENSOR_PROBABILITY`)
+- Contador de tentativas; após `MAX_DOOR_ATTEMPTS` → alerta ao operador
+- Após `DOOR_BLOCK_TIMEOUT` segundos em `DOOR_BLOCKED` → escalonamento manual
+- Eventos persistidos no PostgreSQL
 
-1. Simulado via botão no painel ou automaticamente com probabilidade configurável
-2. Cada acionamento incrementa um contador de tentativas
-3. Após 3 tentativas, o sistema emite alerta para o painel do operador
-4. Após 30 segundos no estado `DOOR_BLOCKED`, escala para intervenção manual
-5. Todos os eventos são persistidos no banco com timestamp e estação
+**Comandos do operador (WebSocket):** `door:block`, `door:unblock`, `operator:force-stop`, `operator:release`, `simulation:set-speed`
 
 ---
 
-## Como Executar
+## Como executar (Docker)
 
 ### Pré-requisitos
 
-- Docker Desktop >= 24.x
-- Node.js >= 20.x (para desenvolvimento local)
-- Git
+- Docker Desktop >= 24.x  
+- Git  
 
-### Execução completa com Docker
+### Subir tudo
 
 ```bash
 git clone https://github.com/jonasferreira-silva1/metro-recife-simulator
@@ -144,90 +132,96 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Acesse em: **http://localhost:3000**
+Abra **http://localhost:3000**
 
-### Desenvolvimento local
-
-```bash
-# Backend
-cd backend && npm install && npm run start:dev
-
-# Frontend (outro terminal)
-cd frontend && npm install && npm run dev
-```
-
-### Testes
+### Testes (backend — FSM)
 
 ```bash
 cd backend
-npm run test        # testes unitários da FSM
-npm run test:cov    # com cobertura
+npm install
+npm run test
+```
+
+### Desenvolvimento local (sem Docker)
+
+```bash
+# Terminal 1 — backend
+cd backend && npm install && npm run start:dev
+
+# Terminal 2 — frontend
+cd frontend && npm install && npm run dev
 ```
 
 ---
 
-## Variáveis de Ambiente
+## Variáveis de ambiente
 
 | Variável | Padrão | Descrição |
-|---|---|---|
-| `DATABASE_URL` | `postgresql://metro:metro@db:5432/metro_recife` | Conexão com PostgreSQL |
-| `PORT` | `3001` | Porta do backend |
-| `SIMULATION_TICK_MS` | `1000` | Intervalo do timer em ms |
-| `DOOR_SENSOR_PROBABILITY` | `0.1` | Chance de bloqueio automático |
+|----------|--------|-----------|
+| `DATABASE_URL` | `postgresql://metro:metro@db:5432/metro_recife` | PostgreSQL |
+| `PORT` | `3001` | Backend |
+| `FRONTEND_URL` | `http://localhost:3000` | CORS |
+| `SIMULATION_TICK_MS` | `1000` | Intervalo do tick |
+| `DOOR_SENSOR_PROBABILITY` | `0.1` | Bloqueio automático |
 | `MAX_DOOR_ATTEMPTS` | `3` | Tentativas antes do alerta |
-| `DOOR_BLOCK_TIMEOUT` | `30` | Segundos até escalonamento manual |
-| `NEXT_PUBLIC_WS_URL` | `http://localhost:3001` | URL do WebSocket para o frontend |
+| `DOOR_BLOCK_TIMEOUT` | `30` | Segundos até escalonamento |
+| `NEXT_PUBLIC_WS_URL` | `http://localhost:3001` | WebSocket no frontend |
 
 ---
 
-## Estrutura do Projeto
+## Fases de desenvolvimento
+
+| Fase | Status | Entrega |
+|------|--------|---------|
+| **1 — Fundação** | Concluída | NestJS, FSM, seed 30 estações, WS, testes unitários |
+| **2 — Painel RT** | Concluída | Next.js, `useSocket`, mapa, cards, log, velocidade |
+| **3 — Sensor & operador** | Concluída | Comandos WS, alertas, REST de teste, persistência |
+| **4 — Polimento** | Em andamento | CI/CD, deploy, GIF no README, integração Joana Bezerra |
+
+---
+
+## Estrutura do repositório
 
 ```
 metro-recife-simulator/
-├── backend/                    # NestJS API
-│   └── src/
-│       ├── simulation/         # Motor + FSM + WebSocket Gateway
-│       ├── stations/           # Módulo de estações + seed automático
-│       └── events/             # Log de eventos persistido no banco
-├── frontend/                   # Next.js App Router
-│   ├── app/
-│   └── components/metro/       # Componentes do painel de controle
-├── docs/                       # Documentação técnica completa
+├── backend/src/
+│   ├── simulation/     # FSM, service, gateway, controller
+│   ├── stations/       # Seed idempotente das 30 estações
+│   └── events/         # Log no PostgreSQL
+├── frontend/
+│   ├── components/metro/   # Dashboard, mapa, operador, sensor
+│   ├── hooks/use-socket.ts
+│   └── lib/metro/          # Store, tipos, cliente WS
+├── docs/               # Documentação técnica detalhada
 ├── docker-compose.yml
-├── .env.example
-└── README.md
+└── .env.example
 ```
 
 ---
 
-## Fases de Desenvolvimento
+## Documentação técnica
 
-- [x] **Fase 1** — Fundação: monorepo, NestJS, FSM, WebSocket Gateway, seed das estações
-- [ ] **Fase 2** — Painel em tempo real: hook `useSocket`, TrainMap, TrainCard, EventLog
-- [ ] **Fase 3** — Sensor de porta e painel do operador com alertas
-- [ ] **Fase 4** — Duas linhas simultâneas, CI/CD, deploy ao vivo
+- [Visão geral](./docs/01-visao-geral.md) · [Arquitetura](./docs/02-arquitetura.md) · [Estações](./docs/03-estacoes.md)
+- [FSM](./docs/04-fsm.md) · [Modelo de dados](./docs/05-modelo-de-dados.md) · [WebSocket](./docs/06-websocket.md)
+- [Fases](./docs/07-fases.md) · [Commits](./docs/08-commits.md) · [Como executar](./docs/09-como-executar.md)
 
 ---
 
-## Documentação Técnica
+## Decisões técnicas (resumo)
 
-A pasta [`docs/`](./docs/) contém a documentação completa do projeto:
-
-- [Visão Geral](./docs/01-visao-geral.md)
-- [Arquitetura](./docs/02-arquitetura.md)
-- [Estações](./docs/03-estacoes.md)
-- [Máquina de Estados (FSM)](./docs/04-fsm.md)
-- [Modelo de Dados](./docs/05-modelo-de-dados.md)
-- [Contrato WebSocket](./docs/06-websocket.md)
-- [Fases de Desenvolvimento](./docs/07-fases.md)
-- [Guia de Commits](./docs/08-commits.md)
-- [Como Executar](./docs/09-como-executar.md)
+| Decisão | Motivo |
+|---------|--------|
+| NestJS | Módulos, DI e Gateway WebSocket nativos |
+| FSM em TS puro | Domínio explícito, testável, sem biblioteca extra |
+| Socket.io | Reconexão e integração simples com Next.js |
+| PostgreSQL | Histórico consultável em entrevistas |
+| Docker Compose | Um comando para quem avalia o portfólio |
 
 ---
 
 <div align="center">
 
-**Jonas Ferreira Silva** — Full-Stack Developer | Recife, Pernambuco
+**Jonas Ferreira Silva** — Full-Stack Developer · Recife, Pernambuco
 
 [github.com/jonasferreira-silva1](https://github.com/jonasferreira-silva1)
 

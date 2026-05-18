@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { useSimulationStore } from "@/lib/metro/simulation-store";
+import { useSimulationStore, setSimulationSpeed } from "@/lib/metro/simulation-store";
 import { linhaCentroStations, linhaSulStations } from "@/lib/metro/stations";
 import { Line } from "@/lib/metro/types";
 import { useSocket } from "@/hooks/use-socket"; // NOVO HOOK DE WEBSOCKET
@@ -23,7 +23,6 @@ export function Dashboard() {
     alerts,
     speed,
     isConnected,
-    setSpeed,
     clearAlert,
   } = useSimulationStore();
 
@@ -33,13 +32,11 @@ export function Dashboard() {
   useSocket();
 
   const handleSpeedChange = useCallback((newSpeed: number) => {
-    setSpeed(newSpeed);
-    // Nota futura: Aqui você pode emitir via socket para o backend alterar o timer também!
-  }, [setSpeed]);
+    setSimulationSpeed(newSpeed);
+  }, []);
 
   const handleToggleRunning = useCallback(() => {
-    // setIsRunning(!isRunning);
-    alert('Na versão WebSocket, o controle de Pause deve ser enviado ao Backend!');
+    // A simulação é autônoma no backend; pausa global pode ser Fase 4
   }, []);
 
   const handleClearAlert = useCallback((trainId: string) => {

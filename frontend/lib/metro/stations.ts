@@ -64,3 +64,27 @@ export function getTerminalStation(line: Line, position: "start" | "end"): Stati
   const stations = getStationsByLine(line);
   return position === "start" ? stations[0] : stations[stations.length - 1];
 }
+
+/**
+ * Resolve estação pela linha + orderIndex (preferido) ou nome.
+ * Evita confundir "Recife" da Linha Centro com "Recife" da Linha Sul.
+ */
+export function resolveStationOnLine(
+  line: Line,
+  name: string | null | undefined,
+  orderIndex?: number | null,
+): Station {
+  const stations = getStationsByLine(line);
+
+  if (orderIndex != null && orderIndex >= 0) {
+    const byOrder = stations.find((s) => s.orderIndex === orderIndex);
+    if (byOrder) return byOrder;
+  }
+
+  if (name) {
+    const byName = stations.find((s) => s.name === name);
+    if (byName) return byName;
+  }
+
+  return stations[0];
+}

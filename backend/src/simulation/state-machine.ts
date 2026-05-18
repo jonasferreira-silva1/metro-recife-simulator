@@ -64,9 +64,16 @@ export function processTick(
       break;
 
     case TrainState.ARRIVING:
-      // Fica 3 ticks "Chegando" (freando). Ao parar, emite o evento de que chegou.
+      // Ao parar na plataforma, o índice da estação avança (ou recua no sentido return).
+      // Durante MOVING/ARRIVING o trem permanece indexado na estação de ORIGEM do trecho.
       if (t >= ticks(3)) {
-        return { newState: TrainState.STOPPED, stationIndexDelta: 0, doorAttemptsReset: false, eventToEmit: 'train:arrived' };
+        const arrivalDelta = train.isForward ? 1 : -1;
+        return {
+          newState: TrainState.STOPPED,
+          stationIndexDelta: arrivalDelta,
+          doorAttemptsReset: false,
+          eventToEmit: 'train:arrived',
+        };
       }
       break;
 
@@ -107,26 +114,21 @@ export function processTick(
 
     case TrainState.DEPARTING:
       if (t >= ticks(2)) {
-        let delta = train.isForward ? 1 : -1;
         let reversed = false;
-        
-        // LÓGICA DE FIM DE LINHA (Terminal):
-        // Se bateu na última estação indo pra frente, ou na primeira estação voltando, inverte a direção
+
+        // Terminal: inverte sentido; o índice só muda na chegada (ARRIVING → STOPPED)
         if (train.isForward && train.currentStationIndex >= train.lineLength - 1) {
-          delta = 0; // Não avança para uma estação inexistente
-          reversed = true; // Muda o sentido do trem
+          reversed = true;
         } else if (!train.isForward && train.currentStationIndex <= 0) {
-          delta = 0;
           reversed = true;
         }
 
-        // Trem parte oficialmente, emite evento para os painéis
-        return { 
-          newState: TrainState.MOVING, 
-          stationIndexDelta: delta, 
-          doorAttemptsReset: false, 
+        return {
+          newState: TrainState.MOVING,
+          stationIndexDelta: 0,
+          doorAttemptsReset: false,
           eventToEmit: 'train:departed',
-          directionReversed: reversed
+          directionReversed: reversed,
         };
       }
       break;

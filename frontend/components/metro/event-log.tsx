@@ -105,7 +105,12 @@ export function EventLog({ events, maxItems = 50 }: EventLogProps) {
                 >
                   <Icon className={cn("mt-0.5 h-3 w-3 shrink-0", config.color)} />
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1">
+                    <div className="flex flex-wrap items-center gap-1">
+                      {event.trainName && (
+                        <span className="truncate font-semibold text-foreground">
+                          {event.trainName}:
+                        </span>
+                      )}
                       <span className={cn("font-medium", config.color)}>
                         {config.label}
                       </span>
@@ -117,6 +122,15 @@ export function EventLog({ events, maxItems = 50 }: EventLogProps) {
                           </span>
                         </>
                       )}
+                      {event.eventType === EventType.TRAIN_DEPARTED &&
+                        event.payload?.toStationName && (
+                          <>
+                            <span className="text-muted-foreground">→</span>
+                            <span className="truncate text-muted-foreground">
+                              {String(event.payload.toStationName)}
+                            </span>
+                          </>
+                        )}
                     </div>
                     <div className="text-[10px] text-muted-foreground">{time}</div>
                   </div>
