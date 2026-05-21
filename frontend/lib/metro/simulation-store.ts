@@ -14,6 +14,7 @@ interface SimulationStore {
   alerts: OperatorAlert[];
   speed: number;
   isConnected: boolean;
+  isRunning: boolean;
 
   setTrains: (trains: Train[]) => void;
   updateTrain: (train: Partial<Train> & { id: string }) => void;
@@ -30,6 +31,7 @@ export const useSimulationStore = create<SimulationStore>((set) => ({
   alerts: [],
   speed: 1,
   isConnected: false,
+  isRunning: true,
 
   setTrains: (trains) => set({ trains }),
 
@@ -62,6 +64,7 @@ export const useSimulationStore = create<SimulationStore>((set) => ({
   setSpeed: (speed) => set({ speed }),
 
   setIsConnected: (connected) => set({ isConnected }),
+  setIsRunning: (running: boolean) => set({ isRunning: running }),
 }));
 
 // ── Comandos do operador → Backend (contrato docs/06-websocket.md) ─────────

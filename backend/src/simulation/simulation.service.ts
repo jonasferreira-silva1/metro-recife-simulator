@@ -31,6 +31,9 @@ export class SimulationService implements OnApplicationBootstrap, OnApplicationS
   private timer: NodeJS.Timeout;
   private isTickRunning = false;
 
+  /** Pausa global da simulação (Fase 4) — o loop continua, mas não processa FSM */
+  private simulationPaused = false;
+
   /** Trens em parada forçada — a FSM não avança até operator:release */
   private readonly operatorHeldTrainIds = new Set<string>();
 
@@ -239,6 +242,37 @@ export class SimulationService implements OnApplicationBootstrap, OnApplicationS
     await this.eventsService.logEvent(EventType.DOOR_UNBLOCKED, train.id, train.currentStation?.id);
   }
 
+  /** Indica se o motor está processando ticks da FSM */
+  isSimulationRunning(): boolean {
+    return !this.simulationPaused;
+  }
+
+  /** Pausa todos os trens (estado congelado no banco) */
+  pauseSimulation(): void {
+    if (this.simulationPaused) return;
+    this.simulationPaused = true;
+    this.logger.log('Simulação pausada pelo operador');
+    this.gateway.emitSimulationStatus({ isRunning: false });
+  }
+
+  /** Retoma o processamento da FSM */
+  resumeSimulation(): void {
+    if (!this.simulationPaused) return;
+    this.simulationPaused = false;
+    this.logger.log('Simulação retomada');
+    this.gateway.emitSimulationStatus({ isRunning: true });
+  }
+
+  /** Alterna pausa/retomada */
+  toggleSimulationPause(): boolean {
+    if (this.simulationPaused) {
+      this.resumeSimulation();
+    } else {
+      this.pauseSimulation();
+    }
+    return !this.simulationPaused;
+  }
+
   /** Altera o multiplicador de velocidade de todos os trens */
   async setSimulationSpeed(multiplier: number): Promise<void> {
     const allowed = [1, 2, 5, 10];
@@ -275,11 +309,17 @@ export class SimulationService implements OnApplicationBootstrap, OnApplicationS
       const snapshotPayload = [];
 
       for (const train of trains) {
-        await this.processTrainTick(train, timestamp);
+        if (!this.simulationPaused) {
+          await this.processTrainTick(train, timestamp);
+        }
         snapshotPayload.push(this.buildSnapshot(train));
       }
 
-      this.gateway.emitSimulationTick({ timestamp, trains: snapshotPayload });
+      this.gateway.emitSimulationTick({
+        timestamp,
+        trains: snapshotPayload,
+        isRunning: !this.simulationPaused,
+      });
     } finally {
       this.isTickRunning = false;
     }

@@ -9,14 +9,39 @@ import { SimulationService } from './simulation.service';
 export class SimulationController {
   constructor(private readonly simulationService: SimulationService) {}
 
+  @Get('health')
+  health() {
+    return {
+      status: 'ok',
+      service: 'metro-recife-simulator',
+      simulationRunning: this.simulationService.isSimulationRunning(),
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   @Get('status')
   async getStatus() {
-    return this.simulationService.getStatus();
+    return {
+      ...(await this.simulationService.getStatus()),
+      simulationRunning: this.simulationService.isSimulationRunning(),
+    };
   }
 
   @Get('events')
   async getEvents() {
     return this.simulationService.getRecentEvents(100);
+  }
+
+  @Post('pause')
+  pause() {
+    this.simulationService.pauseSimulation();
+    return { ok: true, isRunning: false };
+  }
+
+  @Post('resume')
+  resume() {
+    this.simulationService.resumeSimulation();
+    return { ok: true, isRunning: true };
   }
 
   @Post(':trainId/door-event')

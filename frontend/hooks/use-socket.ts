@@ -16,6 +16,8 @@ export function useSocket() {
     useSimulationStore();
 
   useEffect(() => {
+    const { setIsRunning } = useSimulationStore.getState();
+
     const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "http://localhost:3001";
 
     const socket = io(WS_URL, {
@@ -34,11 +36,19 @@ export function useSocket() {
       setIsConnected(false);
     });
 
-    // Snapshot autoritativo a cada tick — fonte única para posição no mapa
-    socket.on("simulation:tick", (data: { trains: Array<Record<string, unknown>> }) => {
-      const mappedTrains = data.trains.map((t) => mapTrainFromSnapshot(t));
-      setTrains(mappedTrains);
+    // Estado autoritativo da simulação (pausa/retomada)
+    socket.on("simulation:status", (payload: { isRunning: boolean }) => {
+      setIsRunning(payload.isRunning);
     });
+
+    // Snapshot autoritativo a cada tick — fonte única para posição no mapa
+    socket.on(
+      "simulation:tick",
+      (data: { trains: Array<Record<string, unknown>> }) => {
+        const mappedTrains = data.trains.map((t) => mapTrainFromSnapshot(t));
+        setTrains(mappedTrains);
+      },
+    );
 
     // Atualização parcial: só estado (posição vem no próximo tick)
     socket.on(
@@ -95,7 +105,9 @@ export function useSocket() {
         stationId: string;
         message: string;
       }) => {
-        const train = useSimulationStore.getState().trains.find((t) => t.id === payload.trainId);
+        const train = useSimulationStore
+          .getState()
+          .trains.find((t) => t.id === payload.trainId);
         const station =
           train?.currentStation ??
           allStations.find((s) => s.id === payload.stationId) ??

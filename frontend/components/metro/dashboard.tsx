@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback } from "react";
-import { useSimulationStore, setSimulationSpeed } from "@/lib/metro/simulation-store";
+import {
+  useSimulationStore,
+  setSimulationSpeed,
+} from "@/lib/metro/simulation-store";
+import { emitCommand } from "@/lib/metro/socket-client";
 import { linhaCentroStations, linhaSulStations } from "@/lib/metro/stations";
 import { Line } from "@/lib/metro/types";
 import { useSocket } from "@/hooks/use-socket"; // NOVO HOOK DE WEBSOCKET
@@ -17,14 +21,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Train as TrainIcon, Radio, Wifi, Activity } from "lucide-react";
 
 export function Dashboard() {
-  const {
-    trains,
-    events,
-    alerts,
-    speed,
-    isConnected,
-    clearAlert,
-  } = useSimulationStore();
+  const { trains, events, alerts, speed, isConnected, clearAlert, isRunning } =
+    useSimulationStore();
 
   // 🔌 CONECTANDO O DASHBOARD AO BACKEND VIA WEBSOCKET
   // Ao chamar esse hook, a conexão Socket.io é iniciada e a store do Zustand
@@ -37,11 +35,16 @@ export function Dashboard() {
 
   const handleToggleRunning = useCallback(() => {
     // A simulação é autônoma no backend; pausa global pode ser Fase 4
+    // O botão chama onToggleRunning() e aqui emitimos via socket.
+    emitCommand("simulation:toggle-pause", {});
   }, []);
 
-  const handleClearAlert = useCallback((trainId: string) => {
-    clearAlert(trainId);
-  }, [clearAlert]);
+  const handleClearAlert = useCallback(
+    (trainId: string) => {
+      clearAlert(trainId);
+    },
+    [clearAlert],
+  );
 
   const centroTrains = trains.filter((t) => t.line === Line.CENTRO);
   const sulTrains = trains.filter((t) => t.line === Line.SUL);
@@ -64,14 +67,20 @@ export function Dashboard() {
           <div className="flex items-center gap-3">
             <SpeedControl
               speed={speed}
-              isRunning={true} // Forçado a rodar por padrão
+              isRunning={isRunning}
               onSpeedChange={handleSpeedChange}
               onToggleRunning={handleToggleRunning}
             />
 
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="gap-1 text-[10px]">
-                <Radio className={isConnected ? "h-3 w-3 text-[var(--metro-success)]" : "h-3 w-3 text-destructive"} />
+                <Radio
+                  className={
+                    isConnected
+                      ? "h-3 w-3 text-[var(--metro-success)]"
+                      : "h-3 w-3 text-destructive"
+                  }
+                />
                 {isConnected ? "Conectado" : "Offline"}
               </Badge>
               <Badge variant="outline" className="gap-1 text-[10px]">
@@ -168,7 +177,8 @@ export function Dashboard() {
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex flex-col items-center justify-between gap-2 text-xs text-muted-foreground sm:flex-row">
             <div>
-              <span className="font-medium">CBTU</span> — Metrô do Recife Simulator
+              <span className="font-medium">CBTU</span> — Metrô do Recife
+              Simulator
             </div>
             <div className="flex items-center gap-4">
               <span>Desenvolvido por Jonas Ferreira Silva</span>
