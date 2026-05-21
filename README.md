@@ -19,6 +19,16 @@
 
 ---
 
+## Interface do Sistema
+
+![MetroRecife Simulator](frontend/public/Tela.png)
+
+*Painel em tempo real do simulador — visualize trens, estações, eventos e controle operacional*
+
+---
+
+---
+
 ## Uma curiosidade que virou código
 
 Desde criança, toda vez que entrava no metrô eu olhava para aquelas portas, para o apito, para o painel do maquinista e pensava: *como isso funciona por dentro?* Não era vaidade técnica — era curiosidade mesmo. O metrô da CBTU faz parte da rotina de quem vive no Grande Recife: esperar na plataforma, sentir o peso das portas fechando, ver o trem sumir no túnel. Para quase todo mundo é só transporte. Para quem desenvolve software, é um **sistema de estados**.
