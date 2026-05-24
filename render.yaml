@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: metro-recife-backend
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    context: backend
+    plan: free
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        fromDatabase:
+          name: metro-recife-db
+          property: connectionString
+      - key: FRONTEND_URL
+        value: https://metro-recife-simulator.vercel.app # Altere para a URL do seu frontend na Vercel
+      - key: SIMULATION_TICK_MS
+        value: 1000
+      - key: DOOR_SENSOR_PROBABILITY
+        value: 0.1
+      - key: MAX_DOOR_ATTEMPTS
+        value: 3
+      - key: DOOR_BLOCK_TIMEOUT
+        value: 30
+
+databases:
+  - name: metro-recife-db
+    plan: free

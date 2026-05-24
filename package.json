@@ -15,7 +15,7 @@
     "test:backend": "npm run test --workspace=backend"
   },
   "engines": {
-    "node": ">=20.x"
+    "node": ">=20.0.0"
   },
   "author": "Jonas Ferreira Silva <github.com/jonasferreira-silva1>"
 }

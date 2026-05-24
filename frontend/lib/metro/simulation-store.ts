@@ -23,6 +23,7 @@ interface SimulationStore {
   clearAlert: (trainId: string) => void;
   setSpeed: (speed: number) => void;
   setIsConnected: (connected: boolean) => void;
+  setIsRunning: (running: boolean) => void;
 }
 
 export const useSimulationStore = create<SimulationStore>((set) => ({
