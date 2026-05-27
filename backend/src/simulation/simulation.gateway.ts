@@ -3,6 +3,7 @@ import {
   WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   MessageBody,
 } from "@nestjs/websockets";
@@ -24,17 +25,17 @@ import {
  * Gateway WebSocket (Socket.io).
  * - Emite eventos da simulação para o frontend
  * - Recebe comandos do operador (Fase 3)
+ *
+ * CORS é configurado via afterInit para garantir que process.env já foi carregado.
  */
 @WebSocketGateway({
   cors: {
-    origin: (process.env.FRONTEND_URL || '*')
-      .split(',')
-      .map((o) => o.trim()),
-    credentials: true,
+    origin: '*',
+    credentials: false,
   },
 })
 export class SimulationGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
   server: Server;
@@ -45,6 +46,24 @@ export class SimulationGateway
     @Inject(forwardRef(() => SimulationService))
     private readonly simulationService: SimulationService,
   ) {}
+
+  afterInit(server: Server) {
+    // Reconfigura CORS em runtime, após as variáveis de ambiente serem carregadas
+    const allowedOrigins = (process.env.FRONTEND_URL || '*')
+      .split(',')
+      .map((o) => o.trim());
+
+    server.engine.on('headers', (headers: Record<string, string>, req: { headers: { origin?: string } }) => {
+      const origin = req.headers.origin;
+      if (!origin) return;
+      if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+        headers['Access-Control-Allow-Origin'] = origin;
+        headers['Access-Control-Allow-Credentials'] = 'true';
+      }
+    });
+
+    this.logger.log(`WebSocket Gateway iniciado. CORS: ${allowedOrigins.join(', ')}`);
+  }
 
   handleConnection(client: Socket) {
     this.logger.log(`Cliente conectado: ${client.id}`);
