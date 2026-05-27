@@ -14,6 +14,9 @@ import { SimulationModule } from './simulation/simulation.module';
       ssl: {
         rejectUnauthorized: false,
       },
+      retryAttempts: 5,
+      retryDelay: 3000,
+      connectTimeoutMS: 10000,
     }),
 
     StationsModule,
