@@ -27,7 +27,10 @@ import {
  */
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_URL || "*",
+    origin: (process.env.FRONTEND_URL || '*')
+      .split(',')
+      .map((o) => o.trim()),
+    credentials: true,
   },
 })
 export class SimulationGateway
