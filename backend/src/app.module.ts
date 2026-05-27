@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StationsModule } from './stations/stations.module';
 import { EventsModule } from './events/events.module';
@@ -6,6 +7,10 @@ import { SimulationModule } from './simulation/simulation.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // disponível em todos os módulos sem precisar importar novamente
+    }),
+
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
