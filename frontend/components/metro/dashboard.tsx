@@ -53,24 +53,18 @@ export function Dashboard() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <TrainIcon className="h-4 w-4 text-primary-foreground" />
+        <div className="mx-auto max-w-7xl px-4">
+          {/* Linha 1: Logo + Badges de status */}
+          <div className="flex h-14 items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
+                <TrainIcon className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-sm font-bold leading-none">MetroRecife</h1>
+                <p className="text-[10px] text-muted-foreground">Simulator</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-sm font-bold leading-none">MetroRecife</h1>
-              <p className="text-[10px] text-muted-foreground">Simulator</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <SpeedControl
-              speed={speed}
-              isRunning={isRunning}
-              onSpeedChange={handleSpeedChange}
-              onToggleRunning={handleToggleRunning}
-            />
 
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="gap-1 text-[10px]">
@@ -81,7 +75,7 @@ export function Dashboard() {
                       : "h-3 w-3 text-destructive"
                   }
                 />
-                {isConnected ? "Conectado" : "Offline"}
+                <span className="hidden sm:inline">{isConnected ? "Conectado" : "Offline"}</span>
               </Badge>
               <Badge variant="outline" className="gap-1 text-[10px]">
                 <Activity className="h-3 w-3" />
@@ -89,14 +83,24 @@ export function Dashboard() {
               </Badge>
             </div>
           </div>
+
+          {/* Linha 2: Controle de velocidade (largura total em mobile) */}
+          <div className="pb-3">
+            <SpeedControl
+              speed={speed}
+              isRunning={isRunning}
+              onSpeedChange={handleSpeedChange}
+              onToggleRunning={handleToggleRunning}
+            />
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl p-4">
-        <div className="grid gap-6">
+      <main className="mx-auto max-w-7xl p-3 sm:p-4">
+        <div className="grid gap-4 sm:gap-6">
           {/* Mapas das Linhas */}
-          <section className="grid gap-4">
+          <section className="grid gap-3 sm:gap-4">
             <TrainMap
               stations={linhaCentroStations}
               trains={trains}
@@ -112,7 +116,7 @@ export function Dashboard() {
           </section>
 
           {/* Grid de conteúdo */}
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
             {/* Coluna 1: Tabs de Trens e Sensores */}
             <section className="space-y-4 lg:col-span-2">
               <Tabs defaultValue="trains" className="w-full">
@@ -175,12 +179,12 @@ export function Dashboard() {
       {/* Footer */}
       <footer className="mt-8 border-t border-border py-4">
         <div className="mx-auto max-w-7xl px-4">
-          <div className="flex flex-col items-center justify-between gap-2 text-xs text-muted-foreground sm:flex-row">
+          <div className="flex flex-col items-center justify-between gap-2 text-center text-xs text-muted-foreground sm:flex-row sm:text-left">
             <div>
               <span className="font-medium">CBTU</span> — Metrô do Recife
               Simulator
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-4">
               <span>Desenvolvido por Jonas Ferreira Silva</span>
               <a
                 href="https://github.com/jonasferreira-silva1"

@@ -54,10 +54,10 @@ export function OperatorPanel({ alerts, onClearAlert }: OperatorPanelProps) {
         {alerts.map((alert, index) => (
           <div
             key={`${alert.trainId}-${index}`}
-            className="flex items-start justify-between rounded-lg border border-destructive/30 bg-destructive/10 p-3"
+            className="flex flex-col gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 sm:flex-row sm:items-start sm:justify-between"
           >
             <div className="space-y-1">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-semibold">{alert.trainName}</span>
                 <Badge
                   variant="outline"
@@ -83,11 +83,11 @@ export function OperatorPanel({ alerts, onClearAlert }: OperatorPanelProps) {
               </div>
             </div>
 
-            <div className="flex gap-1">
+            <div className="flex shrink-0 gap-1">
               <Button
                 variant="default"
                 size="sm"
-                className="h-7 text-xs"
+                className="h-7 flex-1 text-xs sm:flex-none"
                 onClick={() => handleResolve(alert.trainId)}
               >
                 Resolver
@@ -95,7 +95,7 @@ export function OperatorPanel({ alerts, onClearAlert }: OperatorPanelProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 w-7 p-0"
+                className="h-7 w-7 shrink-0 p-0"
                 onClick={() => onClearAlert(alert.trainId)}
               >
                 <X className="h-3 w-3" />

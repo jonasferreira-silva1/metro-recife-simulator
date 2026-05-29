@@ -31,15 +31,15 @@ export function TrainMap({ stations, trains, line, title }: TrainMapProps) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <div
-            className="h-3 w-3 rounded-full"
+            className="h-3 w-3 shrink-0 rounded-full"
             style={{ backgroundColor: lineColor }}
           />
           <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         </div>
-        <div className="text-xs text-muted-foreground">
+        <div className="pl-5 text-xs text-muted-foreground sm:pl-0">
           {lineTrains.length} trem(ns) ativos
         </div>
       </div>
