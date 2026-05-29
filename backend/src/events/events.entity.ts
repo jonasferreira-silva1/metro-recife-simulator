@@ -31,7 +31,7 @@ export class SimulationEvent {
   eventType: EventType;
 
   @Column({ type: 'jsonb', nullable: true })
-  payload: any;
+  payload: Record<string, unknown> | null;
 
   @CreateDateColumn({ name: 'occurred_at' })
   occurredAt: Date;

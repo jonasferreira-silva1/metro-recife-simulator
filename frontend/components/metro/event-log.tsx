@@ -72,7 +72,7 @@ interface EventLogProps {
 }
 
 export function EventLog({ events, maxItems = 50 }: EventLogProps) {
-  const displayEvents = events.slice(-maxItems).reverse();
+  const displayEvents = events.slice(0, maxItems);
 
   return (
     <div className="rounded-lg border border-border bg-card">
@@ -123,7 +123,7 @@ export function EventLog({ events, maxItems = 50 }: EventLogProps) {
                         </>
                       )}
                       {event.eventType === EventType.TRAIN_DEPARTED &&
-                        event.payload?.toStationName && (
+                        !!event.payload?.toStationName && (
                           <>
                             <span className="text-muted-foreground">→</span>
                             <span className="truncate text-muted-foreground">

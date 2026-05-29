@@ -16,7 +16,7 @@ export class EventsService {
     eventType: EventType,
     trainId?: string,
     stationId?: string,
-    payload?: any,
+    payload?: Record<string, unknown>,
   ): Promise<SimulationEvent> {
     const event = this.eventRepository.create({
       eventType,

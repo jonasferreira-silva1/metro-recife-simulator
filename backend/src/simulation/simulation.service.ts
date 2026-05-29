@@ -3,8 +3,8 @@ import {
   Logger,
   NotFoundException,
   BadRequestException,
-  OnApplicationBootstrap,
-  OnApplicationShutdown,
+  OnModuleInit,
+  OnModuleDestroy,
   Inject,
   forwardRef,
 } from '@nestjs/common';
@@ -19,6 +19,7 @@ import { EventsService } from '../events/events.service';
 import { SimulationGateway } from './simulation.gateway';
 import { TrainState, processTick, TrainContext, StationData } from './state-machine';
 import { EventType } from '../events/events.entity';
+import { SimulationTickTrainSnapshot } from './simulation.types';
 
 /**
  * Serviço responsável por orquestrar toda a simulação do Metrô.
@@ -26,7 +27,7 @@ import { EventType } from '../events/events.entity';
  * - Comandos do operador via WebSocket/REST (Fase 3)
  */
 @Injectable()
-export class SimulationService implements OnApplicationBootstrap, OnApplicationShutdown {
+export class SimulationService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(SimulationService.name);
   private timer: NodeJS.Timeout;
   private isTickRunning = false;
@@ -67,13 +68,13 @@ export class SimulationService implements OnApplicationBootstrap, OnApplicationS
     this.doorBlockTimeoutTicks = timeoutSec;
   }
 
-  async onApplicationBootstrap() {
+  async onModuleInit(): Promise<void> {
     await this.loadStations();
     await this.initializeTrains();
     this.startSimulation();
   }
 
-  onApplicationShutdown() {
+  onModuleDestroy(): void {
     if (this.timer) {
       clearInterval(this.timer);
     }
@@ -306,7 +307,7 @@ export class SimulationService implements OnApplicationBootstrap, OnApplicationS
         relations: ['currentStation', 'nextStation'],
       });
       const timestamp = new Date().toISOString();
-      const snapshotPayload = [];
+      const snapshotPayload: SimulationTickTrainSnapshot[] = [];
 
       for (const train of trains) {
         if (!this.simulationPaused) {

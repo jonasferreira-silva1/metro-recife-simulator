@@ -64,7 +64,7 @@ export const useSimulationStore = create<SimulationStore>((set) => ({
 
   setSpeed: (speed) => set({ speed }),
 
-  setIsConnected: (connected) => set({ isConnected }),
+  setIsConnected: (connected) => set({ isConnected: connected }),
   setIsRunning: (running: boolean) => set({ isRunning: running }),
 }));
 

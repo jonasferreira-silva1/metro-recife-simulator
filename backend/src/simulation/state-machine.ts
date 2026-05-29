@@ -84,13 +84,14 @@ export function processTick(
       }
       break;
 
-    case TrainState.DOORS_OPEN:
+    case TrainState.DOORS_OPEN: {
       // Fica de portas abertas pela metade do tempo de parada estipulado da estação (mínimo de 5 ticks)
       const minDwell = Math.max(5, currentStation.dwellTime / 2);
       if (t >= ticks(minDwell)) {
         return { newState: TrainState.DOORS_CLOSING, stationIndexDelta: 0, doorAttemptsReset: false };
       }
       break;
+    }
 
     case TrainState.DOORS_CLOSING:
       if (t >= ticks(3)) {
