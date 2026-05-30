@@ -12,26 +12,25 @@ export class EventsService {
     private readonly eventRepository: Repository<SimulationEvent>,
   ) {}
 
+  /**
+   * Persiste um evento da simulação no banco e registra no log de observabilidade.
+   */
   async logEvent(
     eventType: EventType,
     trainId?: string,
     stationId?: string,
     payload?: Record<string, unknown>,
   ): Promise<SimulationEvent> {
-    const event = this.eventRepository.create({
-      eventType,
-      trainId,
-      stationId,
-      payload,
-    });
-    
-    // Log to console for observability
-    this.logger.log(`[${eventType}] Train: ${trainId} | Station: ${stationId} ${payload ? JSON.stringify(payload) : ''}`);
+    const event = this.eventRepository.create({ eventType, trainId, stationId, payload });
+
+    this.logger.log(
+      `[${eventType}] Train: ${trainId ?? '-'} | Station: ${stationId ?? '-'}${payload ? ' ' + JSON.stringify(payload) : ''}`,
+    );
 
     return this.eventRepository.save(event);
   }
 
-  async getRecentEvents(limit: number = 50): Promise<SimulationEvent[]> {
+  async getRecentEvents(limit = 50): Promise<SimulationEvent[]> {
     return this.eventRepository.find({
       order: { occurredAt: 'DESC' },
       take: limit,

@@ -3,7 +3,7 @@ import { SimulationService } from './simulation.service';
 
 /**
  * API REST complementar ao WebSocket.
- * Útil para testes manuais (Postman/curl) sem abrir o painel.
+ * Útil para testes manuais via Postman/curl sem precisar abrir o painel.
  */
 @Controller('simulation')
 export class SimulationController {

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Gauge, Play, Pause } from "lucide-react";
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Gauge, Play, Pause } from 'lucide-react';
 
 interface SpeedControlProps {
   speed: number;
@@ -13,31 +13,22 @@ interface SpeedControlProps {
 
 const speedOptions = [1, 2, 5, 10];
 
-export function SpeedControl({
-  speed,
-  isRunning,
-  onSpeedChange,
-  onToggleRunning,
-}: SpeedControlProps) {
+export function SpeedControl({ speed, isRunning, onSpeedChange, onToggleRunning }: SpeedControlProps) {
   return (
-    <div className="flex w-full items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 sm:w-auto sm:gap-4 sm:px-4">
-      <div className="hidden items-center gap-2 sm:flex">
-        <Gauge className="h-4 w-4 text-muted-foreground" />
-        <span className="text-xs font-medium text-muted-foreground">
-          Velocidade
-        </span>
-      </div>
-      <Gauge className="h-4 w-4 shrink-0 text-muted-foreground sm:hidden" />
+    <div className="flex w-full min-w-0 items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1.5">
+      {/* Ícone de velocidade */}
+      <Gauge className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
 
-      <div className="flex flex-1 gap-1 sm:flex-none">
+      {/* Botões de velocidade: tamanho fixo pequeno para caber em 375px */}
+      <div className="flex gap-1 shrink-0">
         {speedOptions.map((s) => (
           <Button
             key={s}
-            variant={speed === s ? "default" : "outline"}
+            variant={speed === s ? 'default' : 'outline'}
             size="sm"
             className={cn(
-              "h-7 flex-1 text-xs sm:w-10 sm:flex-none",
-              speed === s && "bg-primary text-primary-foreground"
+              'h-7 w-9 p-0 text-xs',
+              speed === s && 'bg-primary text-primary-foreground',
             )}
             onClick={() => onSpeedChange(s)}
           >
@@ -46,12 +37,13 @@ export function SpeedControl({
         ))}
       </div>
 
-      <div className="h-4 w-px shrink-0 bg-border" />
+      <div className="h-4 w-px shrink-0 bg-border mx-0.5" />
 
+      {/* Botão pausar/iniciar — só ícone no mobile */}
       <Button
-        variant={isRunning ? "default" : "outline"}
+        variant={isRunning ? 'default' : 'outline'}
         size="sm"
-        className="h-7 shrink-0 gap-1 text-xs"
+        className="h-7 shrink-0 gap-1 px-2 text-xs"
         onClick={onToggleRunning}
       >
         {isRunning ? (

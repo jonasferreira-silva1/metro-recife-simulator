@@ -1,6 +1,6 @@
 import { TrainState } from './state-machine';
 
-/** Payloads do contrato WebSocket (docs/06-websocket.md) */
+/** Payloads do contrato WebSocket — ver docs/06-websocket.md */
 
 export interface TrainStateChangedPayload {
   trainId: string;

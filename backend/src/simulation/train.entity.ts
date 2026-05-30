@@ -34,7 +34,7 @@ export class Train {
 
   @ManyToOne(() => Station, { nullable: true })
   @JoinColumn({ name: 'next_station_id' })
-  nextStation: Station;
+  nextStation: Station | null;
 
   @Column({ type: 'enum', enum: DirectionEnum, default: DirectionEnum.FORWARD })
   direction: DirectionEnum;
@@ -45,8 +45,9 @@ export class Train {
   @Column({ name: 'speed_multiplier', type: 'float', default: 1.0 })
   speedMultiplier: number;
 
+  /** Quantos ticks o trem já passou no estado atual */
   @Column({ name: 'time_in_state', type: 'integer', default: 0 })
-  timeInState: number; // Ticks spent in current state
+  timeInState: number;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;

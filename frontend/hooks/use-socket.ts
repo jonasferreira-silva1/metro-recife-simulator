@@ -1,15 +1,16 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { io } from "socket.io-client";
-import { useSimulationStore } from "@/lib/metro/simulation-store";
-import { allStations } from "@/lib/metro/stations";
-import { setSocket } from "@/lib/metro/socket-client";
-import { mapTrainFromSnapshot } from "@/lib/metro/train-position";
-import { EventType, OperatorAlert, TrainState } from "@/lib/metro/types";
+import { useEffect } from 'react';
+import { io } from 'socket.io-client';
+import { useSimulationStore } from '@/lib/metro/simulation-store';
+import { allStations } from '@/lib/metro/stations';
+import { setSocket } from '@/lib/metro/socket-client';
+import { mapTrainFromSnapshot } from '@/lib/metro/train-position';
+import { EventType, OperatorAlert, TrainState } from '@/lib/metro/types';
 
 /**
- * Conecta ao backend NestJS via Socket.io e sincroniza a store Zustand.
+ * Conecta ao backend NestJS via Socket.io e mantém a store Zustand sincronizada.
+ * Deve ser chamado uma única vez no componente raiz do dashboard.
  */
 export function useSocket() {
   const { setTrains, setIsConnected, updateTrain, addEvent, addAlert } =
@@ -17,57 +18,47 @@ export function useSocket() {
 
   useEffect(() => {
     const { setIsRunning } = useSimulationStore.getState();
+    const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3001';
 
-    const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "http://localhost:3001";
-
+    // Inicia com polling para garantir o handshake, depois faz upgrade para WebSocket
     const socket = io(WS_URL, {
-      transports: ["polling", "websocket"], // polling primeiro para handshake, depois upgrade
+      transports: ['polling', 'websocket'],
     });
 
     setSocket(socket);
 
-    socket.on("connect", () => {
-      console.log("Conectado ao backend:", socket.id);
+    socket.on('connect', () => {
       setIsConnected(true);
     });
 
-    socket.on("disconnect", () => {
-      console.log("Desconectado do backend.");
+    socket.on('disconnect', () => {
       setIsConnected(false);
     });
 
-    // Estado autoritativo da simulação (pausa/retomada)
-    socket.on("simulation:status", (payload: { isRunning: boolean }) => {
+    // Estado autoritativo de pausa/retomada vindo do backend
+    socket.on('simulation:status', (payload: { isRunning: boolean }) => {
       setIsRunning(payload.isRunning);
     });
 
-    // Snapshot autoritativo a cada tick — fonte única para posição no mapa
-    socket.on(
-      "simulation:tick",
-      (data: { trains: Array<Record<string, unknown>> }) => {
-        const mappedTrains = data.trains.map((t) => mapTrainFromSnapshot(t));
-        setTrains(mappedTrains);
-      },
-    );
+    // Snapshot completo a cada tick — fonte única de verdade para posição no mapa
+    socket.on('simulation:tick', (data: { trains: Array<Record<string, unknown>> }) => {
+      setTrains(data.trains.map(mapTrainFromSnapshot));
+    });
 
-    // Atualização parcial: só estado (posição vem no próximo tick)
+    // Atualização parcial de estado — posição é atualizada no próximo tick
     socket.on(
-      "train:state-changed",
+      'train:state-changed',
       (payload: { trainId: string; state: TrainState; timestamp: string }) => {
-        updateTrain({
-          id: payload.trainId,
-          state: payload.state,
-          updatedAt: new Date(payload.timestamp),
-        });
+        updateTrain({ id: payload.trainId, state: payload.state, updatedAt: new Date(payload.timestamp) });
       },
     );
 
     socket.on(
-      "train:door-event",
+      'train:door-event',
       (payload: {
         trainId: string;
         trainName?: string;
-        event: "blocked" | "unblocked";
+        event: 'blocked' | 'unblocked';
         attempts: number;
         stationId: string;
         stationName: string;
@@ -75,10 +66,7 @@ export function useSocket() {
         updateTrain({
           id: payload.trainId,
           doorAttempts: payload.attempts,
-          state:
-            payload.event === "blocked"
-              ? TrainState.DOOR_BLOCKED
-              : TrainState.DOORS_OPEN,
+          state: payload.event === 'blocked' ? TrainState.DOOR_BLOCKED : TrainState.DOORS_OPEN,
         });
 
         addEvent({
@@ -87,10 +75,7 @@ export function useSocket() {
           trainName: payload.trainName,
           stationId: payload.stationId,
           stationName: payload.stationName,
-          eventType:
-            payload.event === "blocked"
-              ? EventType.DOOR_BLOCKED
-              : EventType.DOOR_UNBLOCKED,
+          eventType: payload.event === 'blocked' ? EventType.DOOR_BLOCKED : EventType.DOOR_UNBLOCKED,
           occurredAt: new Date(),
           payload: { attempts: payload.attempts },
         });
@@ -98,16 +83,15 @@ export function useSocket() {
     );
 
     socket.on(
-      "operator:alert",
+      'operator:alert',
       (payload: {
         trainId: string;
-        alertType: OperatorAlert["alertType"];
+        alertType: OperatorAlert['alertType'];
         stationId: string;
         message: string;
       }) => {
-        const train = useSimulationStore
-          .getState()
-          .trains.find((t) => t.id === payload.trainId);
+        // Busca o trem na store para enriquecer o alerta com nome e estação
+        const train = useSimulationStore.getState().trains.find((t) => t.id === payload.trainId);
         const station =
           train?.currentStation ??
           allStations.find((s) => s.id === payload.stationId) ??
@@ -115,7 +99,7 @@ export function useSocket() {
 
         addAlert({
           trainId: payload.trainId,
-          trainName: train?.name ?? "Trem",
+          trainName: train?.name ?? 'Trem',
           alertType: payload.alertType,
           station,
           message: payload.message,
@@ -124,15 +108,9 @@ export function useSocket() {
       },
     );
 
-    // Usa stationName do payload (autoritativo) — a store ainda pode estar 1 tick atrás
     socket.on(
-      "train:arrived",
-      (payload: {
-        trainId: string;
-        trainName: string;
-        stationId: string;
-        stationName: string;
-      }) => {
+      'train:arrived',
+      (payload: { trainId: string; trainName: string; stationId: string; stationName: string }) => {
         addEvent({
           id: crypto.randomUUID(),
           trainId: payload.trainId,
@@ -146,7 +124,7 @@ export function useSocket() {
     );
 
     socket.on(
-      "train:departed",
+      'train:departed',
       (payload: {
         trainId: string;
         trainName: string;

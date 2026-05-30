@@ -9,9 +9,8 @@ const dbLogger = new Logger('TypeORM');
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    // Torna as variáveis de ambiente disponíveis globalmente via ConfigService
+    ConfigModule.forRoot({ isGlobal: true }),
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -19,11 +18,17 @@ const dbLogger = new Logger('TypeORM');
       useFactory: (config: ConfigService) => {
         const url = config.get<string>('DATABASE_URL');
         const useSSL = config.get<string>('DB_SSL') === 'true';
-        dbLogger.log(`Conectando em: ${url?.replace(/:[^:@]+@/, ':***@')} (SSL: ${useSSL})`); // intentional log
+
+        // Loga a URL mascarando a senha para não expor credenciais nos logs
+        dbLogger.log(
+          `Conectando em: ${url?.replace(/:[^:@]+@/, ':***@')} (SSL: ${useSSL})`,
+        );
+
         return {
           type: 'postgres',
           url,
           autoLoadEntities: true,
+          // synchronize: true só é seguro em desenvolvimento; em produção use migrations
           synchronize: true,
           ssl: useSSL ? { rejectUnauthorized: false } : false,
           retryAttempts: 10,

@@ -1,19 +1,24 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { OperatorAlert } from "@/lib/metro/types";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, CheckCircle, X } from "lucide-react";
-import { releaseTrain } from "@/lib/metro/simulation-store";
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { OperatorAlert } from '@/lib/metro/types';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { AlertTriangle, CheckCircle, X } from 'lucide-react';
+import { releaseTrain } from '@/lib/metro/simulation-store';
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface OperatorPanelProps {
   alerts: OperatorAlert[];
   onClearAlert: (trainId: string) => void;
 }
+
+const alertTypeLabels: Record<OperatorAlert['alertType'], string> = {
+  max_attempts: 'Tentativas Excedidas',
+  door_timeout: 'Timeout',
+  emergency:    'Emergência',
+};
 
 export function OperatorPanel({ alerts, onClearAlert }: OperatorPanelProps) {
   const handleResolve = (trainId: string) => {
@@ -26,9 +31,7 @@ export function OperatorPanel({ alerts, onClearAlert }: OperatorPanelProps) {
       <Card className="border-dashed">
         <CardContent className="flex flex-col items-center justify-center py-8">
           <CheckCircle className="mb-2 h-8 w-8 text-[var(--metro-success)]" />
-          <p className="text-sm text-muted-foreground">
-            Nenhum alerta ativo
-          </p>
+          <p className="text-sm text-muted-foreground">Nenhum alerta ativo</p>
         </CardContent>
       </Card>
     );
@@ -45,7 +48,7 @@ export function OperatorPanel({ alerts, onClearAlert }: OperatorPanelProps) {
             </CardTitle>
           </div>
           <Badge variant="destructive" className="text-[10px]">
-            {alerts.length} alerta{alerts.length > 1 ? "s" : ""}
+            {alerts.length} alerta{alerts.length > 1 ? 's' : ''}
           </Badge>
         </div>
       </CardHeader>
@@ -54,20 +57,14 @@ export function OperatorPanel({ alerts, onClearAlert }: OperatorPanelProps) {
         {alerts.map((alert, index) => (
           <div
             key={`${alert.trainId}-${index}`}
+            // Em mobile empilha verticalmente; em desktop fica lado a lado
             className="flex flex-col gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 sm:flex-row sm:items-start sm:justify-between"
           >
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-semibold">{alert.trainName}</span>
-                <Badge
-                  variant="outline"
-                  className="text-[10px] border-destructive/50 text-destructive"
-                >
-                  {alert.alertType === "max_attempts"
-                    ? "Tentativas Excedidas"
-                    : alert.alertType === "door_timeout"
-                    ? "Timeout"
-                    : "Emergência"}
+                <Badge variant="outline" className="text-[10px] border-destructive/50 text-destructive">
+                  {alertTypeLabels[alert.alertType]}
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground">{alert.message}</p>
@@ -75,14 +72,12 @@ export function OperatorPanel({ alerts, onClearAlert }: OperatorPanelProps) {
                 <span>{alert.station.name}</span>
                 <span>•</span>
                 <span>
-                  {formatDistanceToNow(new Date(alert.timestamp), {
-                    addSuffix: true,
-                    locale: ptBR,
-                  })}
+                  {formatDistanceToNow(new Date(alert.timestamp), { addSuffix: true, locale: ptBR })}
                 </span>
               </div>
             </div>
 
+            {/* Botões ocupam largura total no mobile */}
             <div className="flex shrink-0 gap-1">
               <Button
                 variant="default"
